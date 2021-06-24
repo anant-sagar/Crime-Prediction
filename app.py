@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 import pickle
-
+import xgboost as xgb
 
 
 st.title("Crime Prediction")
@@ -20,13 +20,17 @@ as this helps in curbing the crime and increasing the safety of people.''')
 if st.checkbox("About"):
     st.markdown("""Data mining and machine learning have become a vital part of crime detection and prevention. 
     The purpose of this paper is to evaluate data mining methods and their performances that can be used for analyzing the
-    collected data about the past crimes. I identified the most appropriate data mining methods to analyze the collected data
+    collected data about the past crimes. 
+    
+    - I identified the most appropriate data mining methods to analyze the collected data
     from sources specialized in crime prevention by comparing them theoretically and practically. Some attributes of this dataset
     are, gender, age, employment status, crime place. Methods are applied on these data to determine their effectiveness in analyzing
-    and preventing crime. Evaluations on the data showed that the method with a higher performance is “Decision Tree”. This was
-    achieved by some performance measures, such as the number of instances correctly classified, accuracy or precision and recall,
+    and preventing crime. Evaluations on the data showed that the method with a higher performance is “Decision Tree” and XGboost. 
+    -This was
+ achieved by some performance measures, such as the number of instances correctly classified, accuracy or precision and recall,
     that has brought better results compared to other methods. I come to the conclusion that the data mining methods contribute to
     the predictions on the possibility of occurrence of the crime and as a result in its prevention.""")
+    st.subheader("Main algo train is XGboost")
 
 if  st.checkbox("Make Prediction"):
 
@@ -429,6 +433,40 @@ if  st.checkbox("Make Prediction"):
         PctUsePubTrans= st.number_input("Enter PctUsePubTrans")
                     
     LemasPctOfficDrugUn= st.number_input("Enter LemasPctOfficDrugUn")
+
+    if st.button('predict'):
+        input_value = [population, householdsize, racepctblack, racePctWhite,
+        racePctAsian, racePctHisp, agePct12t21, agePct12t29,
+        agePct16t24, agePct65up, numbUrban, pctUrban, medIncome,
+        pctWWage, pctWFarmSelf, pctWInvInc, pctWSocSec, pctWPubAsst,
+        pctWRetire, medFamInc, perCapInc, whitePerCap, blackPerCap,
+        indianPerCap, AsianPerCap, OtherPerCap, HispPerCap,
+        NumUnderPov, PctPopUnderPov, PctLess9thGrade, PctNotHSGrad,
+        PctBSorMore, PctUnemployed, PctEmploy, PctEmplManu,
+        PctEmplProfServ, PctOccupManu, PctOccupMgmtProf, MalePctDivorce,
+        MalePctNevMarr, FemalePctDiv, TotalPctDiv, PersPerFam,
+        PctFam2Par, PctKids2Par, PctYoungKids2Par, PctTeen2Par,
+        PctWorkMomYoungKids, PctWorkMom, NumIlleg, PctIlleg, NumImmig,
+        PctImmigRecent, PctImmigRec5, PctImmigRec8, PctImmigRec10,
+        PctRecentImmig, PctRecImmig5, PctRecImmig8, PctRecImmig10,
+        PctSpeakEnglOnly, PctNotSpeakEnglWell, PctLargHouseFam,
+        PctLargHouseOccup, PersPerOccupHous, PersPerOwnOccHous,
+        PersPerRentOccHous, PctPersOwnOccup, PctPersDenseHous,
+        PctHousLess3BR, MedNumBR, HousVacant, PctHousOccup,
+        PctHousOwnOcc, PctVacantBoarded, PctVacMore6Mos, MedYrHousBuilt,
+        PctHousNoPhone, PctWOFullPlumb, OwnOccLowQuart, OwnOccMedVal,
+        OwnOccHiQuart, RentLowQ, RentMedian, RentHighQ, MedRent,
+        MedRentPctHousInc, MedOwnCostPctInc, MedOwnCostPctIncNoMtg,
+        NumInShelters, NumStreet, PctForeignBorn, PctBornSameState,
+        PctSameHouse85, PctSameCity85, PctSameState85, LandArea,
+        PopDens, PctUsePubTrans, LemasPctOfficDrugUn]
+
+        loaded_model = xgb.XGBClassifier()
+        loaded_model.load_model('models/crime.model')
+        x = np.array([input_value])
+        out = loaded_model.predict(x)
+        st.title("prediction")
+        st.success("low chances of crime" if out[0] == 0 else "high chance of crimnal activity")
 
 if st.checkbox("Visualization"):
     visualization= st.sidebar.selectbox("Training Data Graphs",["agePct12t21_chart","agePct12t21_scatter","agePct12t29_chart","agePct12t29_scatter","agePct16t24_chart"
